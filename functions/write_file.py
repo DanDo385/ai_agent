@@ -2,21 +2,20 @@ import os
 
 def write_file(working_directory, file_path, content):
     try:
-        # Normalize paths
+        # Get absolute, normalized paths
         wd = os.path.abspath(working_directory)
-        target = os.path.abspath(file_path)
+        target = os.path.abspath(os.path.join(working_directory, file_path))
 
-        # Check within working_directory
-        common = os.path.commonpath([wd, target])
-        if common != wd:
+        # Ensure target is within working_directory
+        if os.path.commonpath([wd, target]) != wd:
             return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
 
-        # Create directories if needed
-        dir_name = os.path.dirname(target)
-        if dir_name and not os.path.exists(dir_name):
-            os.makedirs(dir_name, exist_ok=True)
+        # Make sure directory exists
+        parent = os.path.dirname(target)
+        if parent and not os.path.exists(parent):
+            os.makedirs(parent, exist_ok=True)
 
-        # Write
+        # Write/overwrite the file
         with open(target, "w") as f:
             f.write(content)
 
