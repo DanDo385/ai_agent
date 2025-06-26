@@ -1,10 +1,6 @@
-from functions.run_python import run_python_file
+from functions.get_files_info import get_files_info
 
-def run_tests():
-    print(run_python_file("calculator", "main.py"))
-    print(run_python_file("calculator", "tests.py"))
-    print(run_python_file("calculator", "../main.py"))
-    print(run_python_file("calculator", "nonexistent.py"))
-
-if __name__ == "__main__":
-    run_tests()
+print(get_files_info("calculator", "."))
+print(get_files_info("calculator", "pkg"))
+print(get_files_info("calculator", "/bin"))
+print(get_files_info("calculator", "../"))
