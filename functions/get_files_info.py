@@ -1,27 +1,30 @@
 import os
 
-MAX_CHARS = 10000
-
-def get_file_content(working_directory, file_path):
+def get_files_info(working_directory, directory=None):
     try:
-        abs_working_dir = os.path.abspath(working_directory)
-        abs_file_path = os.path.abspath(os.path.join(working_directory, file_path))
-        
-        # Check if the file is inside the permitted working directory
-        if not abs_file_path.startswith(abs_working_dir):
-            return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
+        # Build the absolute path of the directory to inspect
+        target_dir = directory or "."
+        abs_working = os.path.abspath(working_directory)
+        abs_target = os.path.abspath(os.path.join(working_directory, target_dir))
 
-        # Check if it is a file
-        if not os.path.isfile(abs_file_path):
-            return f'Error: File not found or is not a regular file: "{file_path}"'
+        # Security check: Must be inside the working directory
+        if not abs_target.startswith(abs_working):
+            return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
 
-        # Read and truncate if necessary
-        with open(abs_file_path, "r") as f:
-            content = f.read(MAX_CHARS + 1)  # Read one extra char to check length
+        if not os.path.isdir(abs_target):
+            return f'Error: "{directory}" is not a directory'
 
-        if len(content) > MAX_CHARS:
-            content = content[:MAX_CHARS] + f'\n[...File "{file_path}" truncated at 10000 characters]'
-        return content
+        entries = []
+        for entry in os.listdir(abs_target):
+            full_path = os.path.join(abs_target, entry)
+            is_dir = os.path.isdir(full_path)
+            try:
+                size = os.path.getsize(full_path)
+            except Exception:
+                size = "unknown"
+            entries.append(f'- {entry}: file_size={size} bytes, is_dir={is_dir}')
 
+        # Join results or note empty dir
+        return "\n".join(entries) if entries else "(empty directory)"
     except Exception as e:
         return f"Error: {e}"
