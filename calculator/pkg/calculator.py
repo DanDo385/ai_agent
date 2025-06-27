@@ -33,6 +33,8 @@ class Calculator:
                     self._apply_operator(operators, values)
                 operators.append(token)
             else:
+                # ...
+
                 try:
                     values.append(float(token))
                 except ValueError:
